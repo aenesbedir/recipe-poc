@@ -24,9 +24,27 @@ The variant A message is decisive: **the importer enforces a source allowlist.**
 Only Cookidoo itself and Vorwerk community sites are accepted. Markup format is
 irrelevant for a non-approved domain.
 
-The two variants produced different messages from the same domain, most likely
-because they were submitted through different entry points (the a2c deep link vs
-the Created Recipes import box). The outcome is the same either way.
+### Two entry points behave differently
+
+The same domain produced two different messages, which turned out to be an entry
+point difference, not a source difference:
+
+| Entry point | Source | Result |
+|---|---|---|
+| Created Recipes → `+` → Import recipe | approved (recipecommunity.com.au) | **imports successfully** |
+| Created Recipes → `+` → Import recipe | ours (github.io) | rejected, allowlist message |
+| `add-to-cookidoo?recipeUrl=` deep link | anything, including an approved source | generic failure |
+
+Conclusions:
+
+- The **import box** is the real code path. It performs the source check and
+  produces the specific allowlist message.
+- The **deep link** is broken on the Turkish market. It fails generically even for
+  an approved Vorwerk source, which matches `NOTES.md` §4: the a2c widget has no
+  market entry for Turkey, so the route it points at was never wired up here.
+- Turkey's market **does** accept a recipe from a foreign approved market (an
+  Australian Recipe Community URL imported fine into a `tr-TR` account). The gate is
+  the domain alone — not language, not market.
 
 Column meanings:
 
@@ -44,16 +62,23 @@ https://cookidoo.com.tr/created-recipes/tr-TR/add-to-cookidoo?recipeUrl=<url>
 
 | Question | Answer |
 |----------|--------|
-| Does the path exist on tr-TR? | **Yes.** It reaches the import flow and returns an import-specific error, not a 404. |
-| Is `partnerId` required to reach the flow? | **No.** Requests without it are processed and fail on the source check, not on authorization. |
-
-This corrects `NOTES.md` §4: Turkey's absence from the widget's market table does
-**not** mean the endpoint is undeployed for Turkey. The widget cannot be configured
-for `tr`, but the underlying import route exists.
+| Does the path exist on tr-TR? | It responds, but never succeeds — an approved Vorwerk source fails through it too. Effectively non-functional on this market. |
+| Is `partnerId` required to reach the flow? | No. Its absence is not what causes the failure. |
+| Usable at all? | No. Use the Created Recipes import box instead. |
 
 ## Step 4 — behaviour on the appliance
 
-Not reached. Nothing imported, so there was nothing to open on the appliance.
+**Now testable.** The Recipe Community recipe imported through the import box is
+sitting in Created Recipes, so the remaining product-critical question can be
+answered with it — no third-party site required.
+
+| Question | Answer |
+|----------|--------|
+| Recipe visible under Created Recipes on the appliance? | |
+| Steps shown one by one? | |
+| Temperature/time/speed set automatically when advancing a step? | |
+| Or does the user dial them in by hand? | |
+| Timer starts on its own? | |
 
 ## Conclusion
 
