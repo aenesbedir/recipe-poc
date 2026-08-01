@@ -1,5 +1,11 @@
 # recipe-poc
 
+> **Answered: no.** Cookidoo enforces a source allowlist. Importing from a
+> third-party domain is rejected before any markup is read:
+> *"Bu web sitesinden içeri aktarım şu anda onaylanmış değil. Yalnızca Cookidoo veya
+> Vorwerk topluluk sitelerinden aktarıma izin verilmektedir."*
+> Full results and product consequences in [`RESULTS.md`](RESULTS.md).
+
 Throwaway test pages for one question:
 
 > Can Cookidoo's "Created Recipes → Import recipe" flow import a recipe from a

@@ -14,11 +14,19 @@ Environment:
 
 Paste each URL into Created Recipes → Import recipe.
 
-| # | Variant | URL | Import accepted? | Title | Ingredients | Steps | Settings (temp/time/speed) | Notes |
-|---|---------|-----|------------------|-------|-------------|-------|----------------------------|-------|
-| 1 | B (microdata) | https://aenesbedir.github.io/recipe-poc/v1/b-microdata.html | | | | | | |
-| 2 | A (JSON-LD) | https://aenesbedir.github.io/recipe-poc/v1/a-jsonld.html | | | | | | |
-| 3 | C (plain) | https://aenesbedir.github.io/recipe-poc/v1/c-plain.html | | | | | | |
+| # | Variant | URL | Import accepted? | Error |
+|---|---------|-----|------------------|-------|
+| 1 | B (microdata) | https://aenesbedir.github.io/recipe-poc/v1/b-microdata.html | no | "Tarif içe aktarılamadı — İçe aktarım esnasında bazı şeyler ters gitti. Buna alternatif olarak, yeni bir tarif oluşturabilir ve her bir tarif ögesini kaynak sayfadan manuel olarak kopyalayıp, yapıştırabilirsiniz." |
+| 2 | A (JSON-LD) | https://aenesbedir.github.io/recipe-poc/v1/a-jsonld.html | no | "Tarif içe aktarılamadı — Bu web sitesinden içeri aktarım şu anda onaylanmış değil. Yalnızca Cookidoo veya Vorwerk topluluk sitelerinden aktarıma izin verilmektedir." |
+| 3 | C (plain) | https://aenesbedir.github.io/recipe-poc/v1/c-plain.html | not run | Skipped — the domain check runs before any markup parsing, so markup cannot change the outcome. |
+
+The variant A message is decisive: **the importer enforces a source allowlist.**
+Only Cookidoo itself and Vorwerk community sites are accepted. Markup format is
+irrelevant for a non-approved domain.
+
+The two variants produced different messages from the same domain, most likely
+because they were submitted through different entry points (the a2c deep link vs
+the Created Recipes import box). The outcome is the same either way.
 
 Column meanings:
 
@@ -30,38 +38,40 @@ Column meanings:
 
 ## Step 3 — partner widget endpoint
 
-While logged in, open:
-
 ```
-https://cookidoo.com.tr/created-recipes/tr-TR/add-to-cookidoo?recipeUrl=https%3A%2F%2Faenesbedir.github.io%2Frecipe-poc%2Fv1%2Fb-microdata.html
+https://cookidoo.com.tr/created-recipes/tr-TR/add-to-cookidoo?recipeUrl=<url>
 ```
-
-| Attempt | partnerId | Result |
-|---------|-----------|--------|
-| no partnerId | — | |
-| invalid partnerId | `test-0000` | |
-
-Record: does the page exist (a real import screen), 404, or a redirect somewhere
-else? If it 404s on tr-TR, the widget path is simply not deployed for Turkey — which
-matches the market list in `NOTES.md` §4.
-
-## Step 4 — behaviour on the appliance
-
-Only if something imported successfully.
 
 | Question | Answer |
 |----------|--------|
-| Recipe visible under Created Recipes on the appliance? | |
-| Steps shown one by one? | |
-| Temperature/time/speed set automatically when advancing a step? | |
-| Or does the user dial them in by hand? | |
-| Timer starts on its own? | |
+| Does the path exist on tr-TR? | **Yes.** It reaches the import flow and returns an import-specific error, not a 404. |
+| Is `partnerId` required to reach the flow? | **No.** Requests without it are processed and fail on the source check, not on authorization. |
+
+This corrects `NOTES.md` §4: Turkey's absence from the widget's market table does
+**not** mean the endpoint is undeployed for Turkey. The widget cannot be configured
+for `tr`, but the underlying import route exists.
+
+## Step 4 — behaviour on the appliance
+
+Not reached. Nothing imported, so there was nothing to open on the appliance.
 
 ## Conclusion
 
-Which of these happened:
+- [x] **Import rejected for every variant → source allowlist. Transfer is out for now.**
 
-- [ ] Import works **and** the appliance sets values automatically → transfer is a real feature, build it.
-- [ ] Import works but the appliance needs manual entry → transfer is cosmetic, secondary at best.
-- [ ] Import rejected for every variant → domain restriction. Transfer is out for now.
-- [ ] Ambiguous → write down exactly what was ambiguous before deciding anything.
+Cookidoo restricts recipe import to Cookidoo and Vorwerk community sites. A
+third-party site cannot become an import source by publishing better markup — the
+gate is the domain, not the format. The tutorial wording "or from other recipe
+websites" means "other *approved* recipe websites" in practice.
+
+### What this means for the product
+
+1. A "Send to Cookidoo" button cannot be built. Do not put one in the MVP.
+2. The realistic fallback is the one Cookidoo's own error message suggests:
+   help the user copy each recipe element into a manually created recipe.
+3. The primary value has to live outside Cookidoo — a step-by-step cooking mode in
+   the web app itself, which also serves TM5/TM31 owners with no subscription.
+4. If the transfer is ever wanted, the ask to Vorwerk is now concrete: get the
+   domain added to the approved-source list, and get a `partnerId` issued for the
+   `add-to-cookidoo` widget. That is a partnership conversation, not an
+   engineering task, and it needs an existing user base first.
