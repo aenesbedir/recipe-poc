@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cookidoo import PoC</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
+  code { background: #f2f2f2; padding: 0 .25rem; }
+  td, th { text-align: left; padding: .4rem .8rem .4rem 0; vertical-align: top; }
+  .meta { color: #555; font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<h1>Cookidoo import PoC</h1>
+
+<p class="meta">
+  Bu, Cookidoo'nun "Oluşturulan Tarifler → Tarifi içe aktar" akışının üçüncü taraf bir siteden
+  URL kabul edip etmediğini ölçmek için hazırlanmış bir test setidir. Ürün değildir.
+</p>
+
+<p>
+  Üç sayfanın <strong>tarif içeriği birebir aynıdır</strong>. Tek fark, sayfadaki
+  makine tarafından okunabilir işaretlemedir. Böylece import başarısız olursa
+  sebebin içerik değil format olduğu ayırt edilebilir.
+</p>
+
+<table>
+  <tr><th>Varyant</th><th>İşaretleme</th><th>Ne test eder</th></tr>
+  <tr>
+    <td><a href="v1/b-microdata.html">B</a></td>
+    <td>schema.org microdata</td>
+    <td>Vorwerk'in kendi Recipe Community sitesindeki yapının aynısı. En iyi ihtimal. <strong>İlk bu denenmeli.</strong></td>
+  </tr>
+  <tr>
+    <td><a href="v1/a-jsonld.html">A</a></td>
+    <td>schema.org JSON-LD</td>
+    <td>Standart, yaygın recipe markup'ı yeterli mi?</td>
+  </tr>
+  <tr>
+    <td><a href="v1/c-plain.html">C</a></td>
+    <td>yok</td>
+    <td>Kontrol grubu. Bu bile geçerse parser düz metinden çıkarım yapıyor demektir.</td>
+  </tr>
+</table>
+
+<p>
+  Test protokolü ve bulgular: <a href="https://github.com/aenesbedir/recipe-poc">GitHub reposu</a>,
+  <code>NOTES.md</code>.
+</p>
+
+</body>
+</html>
